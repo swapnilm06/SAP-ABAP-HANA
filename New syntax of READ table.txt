@@ -1,0 +1,75 @@
+
+SELECT * FROM kna1 INTO TABLE @DATA(lt_kna1).
+DATA(lv_kunnr) = '0000300004'.
+DATA : lv_name TYPE string.
+DATA : lv_name1 TYPE string.
+
+*~~ Replace your READ TABLE queries with new syntax
+
+*~~Get line from table to Work Area.
+
+*--Old syntax
+
+READ TABLE lt_kna1 INTO DATA(wa_kna1) WITH KEY kunnr = lv_kunnr.
+
+*-- New Syntax
+
+DATA(wa2_kna1) = VALUE #( lt_kna1[ kunnr = lv_kunnr ] OPTIONAL ).
+
+
+*-- Read table with Index 1.
+*-- Old way
+READ TABLE lt_kna1 INTO DATA(wa_index1) INDEX 1.
+
+*-- New Syntax / Alternate way
+DATA(wa2_index1) = VALUE #( lt_kna1[ 1 ] OPTIONAL ).
+
+*-- Get a particular field from one table to another variable.
+*--Old way
+
+READ TABLE lt_kna1 INTO DATA(wa_getfield) WITH KEY kunnr = lv_kunnr.
+IF sy-subrc = 0.
+  lv_name = wa_getfield-name1.
+ENDIF.
+
+*-- New way  / Alternate way
+
+lv_name1 = VALUE #( lt_kna1[ kunnr = lv_kunnr ]-name1 OPTIONAL  ).
+
+*--Check particular Value is in Internal Table.
+*--Old way
+
+READ TABLE lt_kna1 TRANSPORTING NO FIELDS WITH KEY kunnr = lv_kunnr.
+IF sy-subrc = 0.
+
+ENDIF.
+
+*-- New way  / Alternate way
+
+IF line_exists( lt_kna1[ kunnr = lv_kunnr ] ) .
+
+ENDIF.
+
+*--Get Index Number of Particular Entry from Internal Table.
+*--Old way
+
+READ TABLE lt_kna1 TRANSPORTING NO FIELDS WITH KEY kunnr = lv_kunnr.
+IF sy-subrc = 0.
+  DATA(lv_tabx) = sy-tabix.
+ENDIF.
+
+*-- New way  / Alternate way
+
+DATA(LV_TABX2) = LINE_INDEX( lt_kna1[ kunnr = lv_kunnr ] ).
+
+*-- Modify Entry in Table.
+*--Old way
+
+READ TABLE lt_kna1 ASSIGNING FIELD-SYMBOL(<FS_KNA1>) WITH KEY kunnr = lv_kunnr.
+IF sy-subrc = 0.
+  <fs_kna1>-name1 = 'SWAPNIL MORE'. "or you can use variable or text element
+ENDIF.
+
+*-- New way  / Alternate way
+
+lt_kna1[ kunnr = lv_kunnr ]-name1 = 'Swapnil More'.
